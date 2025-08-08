@@ -6,5 +6,6 @@ D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain\obj\Debug\net6.0\rainyxinmai
 D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain\obj\Debug\net6.0\rainyxinmain.AssemblyInfoInputs.cache
 D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain\obj\Debug\net6.0\rainyxinmain.AssemblyInfo.cs
 D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain\obj\Debug\net6.0\rainyxinmain.csproj.CoreCompileInputs.cache
+D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain\obj\Debug\net6.0\rainyxinmain.sourcelink.json
 D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain\obj\Debug\net6.0\rainyxinmain.dll
 D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain\obj\Debug\net6.0\rainyxinmain.pdb
