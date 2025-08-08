@@ -1,0 +1,11 @@
+﻿{
+  "Name": "rainyxinmain",
+  "Author": "rainyxin",
+  "Version": "1.0.0",
+  "Description": "A basic Stardew Valley mod template.",
+  "UniqueID": "rainyxin.rainyxinmain",
+  "EntryDll": "rainyxinmain.dll",
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": [],
+  "EnableHarmony": true
+}

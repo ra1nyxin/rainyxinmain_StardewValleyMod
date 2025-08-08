@@ -1,0 +1,12 @@
+{
+  "button.getMoney": "Give 100,000 Coin",
+  "button.timeForward": "Time Forward One Hour",
+  "button.timeBackward": "Time Backward One Hour",
+  "button.warpHome": "Warp Home",
+  "button.spawnMonster": "Spawn Monster Nearby",
+  "button.giveGiftToAll": "Give Gift To All",
+  "button.spawnAllItems": "Spawn All Items",
+  "button.waterAllCrops": "Water All Crops",
+  "button.globalWateringCan.on": "Global Watering Can: ON",
+  "button.globalWateringCan.off": "Global Watering Can: OFF"
+}

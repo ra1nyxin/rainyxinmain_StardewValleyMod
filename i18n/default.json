@@ -1,0 +1,12 @@
+{
+  "button.getMoney": "获得十万金币",
+  "button.timeForward": "时间前进一小时",
+  "button.timeBackward": "时间倒退一小时",
+  "button.warpHome": "传送回家",
+  "button.spawnMonster": "生成怪物在旁边",
+  "button.giveGiftToAll": "送出礼物给所有人",
+  "button.spawnAllItems": "生成所有掉落物",
+  "button.waterAllCrops": "全屏灌溉",
+  "button.globalWateringCan.on": "全图浇水壶: 开",
+  "button.globalWateringCan.off": "全图浇水壶: 关"
+}

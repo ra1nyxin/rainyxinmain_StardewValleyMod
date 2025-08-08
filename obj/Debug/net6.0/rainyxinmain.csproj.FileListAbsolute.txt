@@ -1,0 +1,10 @@
+D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain\bin\Debug\net6.0\rainyxinmain.deps.json
+D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain\bin\Debug\net6.0\rainyxinmain.dll
+D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain\bin\Debug\net6.0\rainyxinmain.pdb
+D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain\obj\Debug\net6.0\rainyxinmain.csproj.AssemblyReference.cache
+D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain\obj\Debug\net6.0\rainyxinmain.GeneratedMSBuildEditorConfig.editorconfig
+D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain\obj\Debug\net6.0\rainyxinmain.AssemblyInfoInputs.cache
+D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain\obj\Debug\net6.0\rainyxinmain.AssemblyInfo.cs
+D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain\obj\Debug\net6.0\rainyxinmain.csproj.CoreCompileInputs.cache
+D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain\obj\Debug\net6.0\rainyxinmain.dll
+D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain\obj\Debug\net6.0\rainyxinmain.pdb
