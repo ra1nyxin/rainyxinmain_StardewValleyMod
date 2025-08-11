@@ -23,6 +23,14 @@ internal sealed class ModEntry : Mod
     public static readonly int rainyTab = 10; // 第10个标签页，从0开始计数
     public const int region_rainyTab = 12350; // 确保ID唯一，在最后一个tab的regionID基础上加1 (12349是exitTab的regionID)
 
+    // 射线绘制功能的状态
+    internal static bool IsLinesDrawActive { get; set; } = false;
+
+    // 移速增减Buff的ID
+    internal const string SpeedIncreaseBuffId = "rainy.SpeedIncreaseBuff";
+    internal const string SpeedDecreaseBuffId = "rainy.SpeedDecreaseBuff";
+    internal static float CurrentSpeedModifier = 0f; // Track cumulative speed changes
+
     /*********
     ** Public methods
     *********/
@@ -59,6 +67,10 @@ internal sealed class ModEntry : Mod
 
         // Subscribe to GameLaunched event to add crafting recipes after game data is loaded
         helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+        helper.Events.GameLoop.SaveLoaded += OnSaveLoaded; // 确保存档加载时也重新注册配方
+
+        // 订阅 RenderedHud 事件以绘制射线
+        helper.Events.Display.RenderedHud += LinesDrawPatch.OnRenderedHud;
 
         harmony.Patch(
             original: AccessTools.Method(typeof(GameLocation), "lockedDoorWarp", new Type[] { typeof(Microsoft.Xna.Framework.Point), typeof(string), typeof(int), typeof(int), typeof(string), typeof(int) }),
@@ -82,6 +94,7 @@ internal sealed class ModEntry : Mod
             original: AccessTools.Method(typeof(GameMenu), nameof(GameMenu.draw), new Type[] { typeof(SpriteBatch) }), // 明确指定参数类型
             postfix: new HarmonyMethod(typeof(GameMenuDrawPatch), nameof(GameMenuDrawPatch.Postfix))
         );
+
     }
 
     private static class ShopPatch
@@ -167,6 +180,7 @@ internal sealed class ModEntry : Mod
     private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
     {
         RegisterCustomCraftingRecipes();
+        CurrentSpeedModifier = 0f; // Reset speed modifier on save load
     }
 
     public void RegisterCustomCraftingRecipes()

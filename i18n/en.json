@@ -8,5 +8,10 @@
   "button.spawnAllItems": "Spawn All Items",
   "button.waterAllCrops": "Water All Crops",
   "button.globalWateringCan.on": "Global Watering Can: ON",
-  "button.globalWateringCan.off": "Global Watering Can: OFF"
+  "button.globalWateringCan.off": "Global Watering Can: OFF",
+  "button.linesDraw.on": "LinesDraw: ON",
+  "button.linesDraw.off": "LinesDraw: OFF",
+  "button.increaseSpeed": "Increase Speed",
+  "button.decreaseSpeed": "Decrease Speed",
+  "button.resetSpeed": "Reset Speed"
 }

@@ -12,6 +12,7 @@ using StardewValley.Characters; // For NPC
 using StardewValley.Objects; // For Item and Object
 using StardewValley.ItemTypeDefinitions; // For ItemRegistry
 using Netcode; // For NetIntDictionary and NetLong
+using StardewValley.Buffs; // For Buff class
 
 namespace rainyxinmain
 {
@@ -45,6 +46,25 @@ namespace rainyxinmain
         private string? waterAllCropsButtonLabel;
         private bool isGlobalWateringCanEnabled; // 新增状态变量
 
+        private Rectangle linesDrawButtonBounds; // 新增射线绘制按钮边界
+        private string? linesDrawButtonLabel;    // 新增射线绘制按钮标签
+        private bool isLinesDrawEnabled;         // 新增射线绘制功能状态
+
+        private Rectangle increaseSpeedButtonBounds; // 新增移速增按钮边界
+        private string increaseSpeedButtonLabel;     // 新增移速增按钮标签
+
+        private Rectangle decreaseSpeedButtonBounds; // 新增移速减按钮边界
+        private string decreaseSpeedButtonLabel;     // 新增移速减按钮标签
+        private Rectangle resetSpeedButtonBounds;    // 新增移速空按钮边界
+        private string resetSpeedButtonLabel;        // 新增移速空按钮标签
+
+        private const int ButtonPadding = 8; // 按钮之间的垂直间距
+        private const int HorizontalPadding = 8; // 按钮之间的水平间距
+        private const int ButtonTextPaddingWidth = 16; // 按钮文本宽度填充
+        private const int ButtonTextPaddingHeight = 3; // 按钮文本高度填充
+        private const int InitialX = 50;
+        private const int InitialY = 113;
+
         public RainyTabPage(int x, int y, int width, int height, IMonitor monitor, IModHelper helper)
             : base(x, y, width, height)
         {
@@ -58,67 +78,87 @@ namespace rainyxinmain
             spawnMonsterButtonLabel = _translationHelper.Get("button.spawnMonster");
             giveGiftToAllButtonLabel = _translationHelper.Get("button.giveGiftToAll");
             spawnAllItemsButtonLabel = _translationHelper.Get("button.spawnAllItems");
-
-            int buttonPadding = 8; // 进一步减小按钮之间的垂直间距
+            increaseSpeedButtonLabel = _translationHelper.Get("button.increaseSpeed"); // 初始化移速增按钮标签
+            decreaseSpeedButtonLabel = _translationHelper.Get("button.decreaseSpeed"); // 初始化移速减按钮标签
+            resetSpeedButtonLabel = _translationHelper.Get("button.resetSpeed"); // 初始化移速空按钮标签
 
             // "给予金币" 按钮
-            int getMoneyButtonWidth = (int)SpriteText.getWidthOfString(getMoneyButtonLabel) + 16; // 进一步减小宽度填充
-            int getMoneyButtonHeight = SpriteText.getHeightOfString(getMoneyButtonLabel) + 3; // 进一步减小高度填充
-            int getMoneyButtonX = x + 50;
-            int getMoneyButtonY = y + 113;
-            this.getMoneyButtonBounds = new Rectangle(getMoneyButtonX, getMoneyButtonY, getMoneyButtonWidth, getMoneyButtonHeight);
+            this.getMoneyButtonBounds = CreateButtonBounds(getMoneyButtonLabel, x + InitialX, y + InitialY);
+
+            // "射线绘制" 按钮 (移动到“给予金币”按钮的右侧)
+            this.isLinesDrawEnabled = ModEntry.IsLinesDrawActive;
+            UpdateLinesDrawButtonLabel();
+            this.linesDrawButtonBounds = CreateButtonBounds(linesDrawButtonLabel, getMoneyButtonBounds.X + getMoneyButtonBounds.Width + HorizontalPadding, getMoneyButtonBounds.Y);
 
             // "时间前进一小时" 按钮
-            int timeForwardButtonWidth = (int)SpriteText.getWidthOfString(timeForwardButtonLabel) + 16;
-            int timeForwardButtonHeight = SpriteText.getHeightOfString(timeForwardButtonLabel) + 3;
-            int timeForwardButtonX = getMoneyButtonX;
-            int timeForwardButtonY = getMoneyButtonY + getMoneyButtonHeight + buttonPadding;
-            this.timeForwardButtonBounds = new Rectangle(timeForwardButtonX, timeForwardButtonY, timeForwardButtonWidth, timeForwardButtonHeight);
+            this.timeForwardButtonBounds = CreateButtonBounds(timeForwardButtonLabel, getMoneyButtonBounds.X, getMoneyButtonBounds.Y + getMoneyButtonBounds.Height + ButtonPadding);
 
             // "时间倒退一小时" 按钮
-            int timeBackwardButtonWidth = (int)SpriteText.getWidthOfString(timeBackwardButtonLabel) + 16;
-            int timeBackwardButtonHeight = SpriteText.getHeightOfString(timeBackwardButtonLabel) + 3;
-            int timeBackwardButtonX = getMoneyButtonX;
-            int timeBackwardButtonY = timeForwardButtonY + timeForwardButtonHeight + buttonPadding;
-            this.timeBackwardButtonBounds = new Rectangle(timeBackwardButtonX, timeBackwardButtonY, timeBackwardButtonWidth, timeBackwardButtonHeight);
+            this.timeBackwardButtonBounds = CreateButtonBounds(timeForwardButtonLabel, timeForwardButtonBounds.X, timeForwardButtonBounds.Y + timeForwardButtonBounds.Height + ButtonPadding);
 
             // "传送回家" 按钮
-            int warpHomeButtonWidth = (int)SpriteText.getWidthOfString(warpHomeButtonLabel) + 16;
-            int warpHomeButtonHeight = SpriteText.getHeightOfString(warpHomeButtonLabel) + 3;
-            int warpHomeButtonX = getMoneyButtonX;
-            int warpHomeButtonY = timeBackwardButtonY + timeBackwardButtonHeight + buttonPadding;
-            this.warpHomeButtonBounds = new Rectangle(warpHomeButtonX, warpHomeButtonY, warpHomeButtonWidth, warpHomeButtonHeight);
+            this.warpHomeButtonBounds = CreateButtonBounds(warpHomeButtonLabel, timeBackwardButtonBounds.X, timeBackwardButtonBounds.Y + timeBackwardButtonBounds.Height + ButtonPadding);
 
             // "生成怪物在旁边" 按钮
-            int spawnMonsterButtonWidth = (int)SpriteText.getWidthOfString(spawnMonsterButtonLabel) + 16;
-            int spawnMonsterButtonHeight = SpriteText.getHeightOfString(spawnMonsterButtonLabel) + 3;
-            int spawnMonsterButtonX = getMoneyButtonX;
-            int spawnMonsterButtonY = warpHomeButtonY + warpHomeButtonHeight + buttonPadding;
-            this.spawnMonsterButtonBounds = new Rectangle(spawnMonsterButtonX, spawnMonsterButtonY, spawnMonsterButtonWidth, spawnMonsterButtonHeight);
+            this.spawnMonsterButtonBounds = CreateButtonBounds(spawnMonsterButtonLabel, warpHomeButtonBounds.X, warpHomeButtonBounds.Y + warpHomeButtonBounds.Height + ButtonPadding);
 
             // "送出礼物给所有人" 按钮
-            int giveGiftToAllButtonWidth = (int)SpriteText.getWidthOfString(giveGiftToAllButtonLabel) + 16;
-            int giveGiftToAllButtonHeight = SpriteText.getHeightOfString(giveGiftToAllButtonLabel) + 3;
-            int giveGiftToAllButtonX = getMoneyButtonX;
-            int giveGiftToAllButtonY = spawnMonsterButtonY + spawnMonsterButtonHeight + buttonPadding;
-            this.giveGiftToAllButtonBounds = new Rectangle(giveGiftToAllButtonX, giveGiftToAllButtonY, giveGiftToAllButtonWidth, giveGiftToAllButtonHeight);
+            this.giveGiftToAllButtonBounds = CreateButtonBounds(giveGiftToAllButtonLabel, spawnMonsterButtonBounds.X, spawnMonsterButtonBounds.Y + spawnMonsterButtonBounds.Height + ButtonPadding);
 
             // "生成所有掉落物" 按钮
-            int spawnAllItemsButtonWidth = (int)SpriteText.getWidthOfString(spawnAllItemsButtonLabel) + 16;
-            int spawnAllItemsButtonHeight = SpriteText.getHeightOfString(spawnAllItemsButtonLabel) + 3;
-            int spawnAllItemsButtonX = getMoneyButtonX;
-            int spawnAllItemsButtonY = giveGiftToAllButtonY + giveGiftToAllButtonHeight + buttonPadding;
-            this.spawnAllItemsButtonBounds = new Rectangle(spawnAllItemsButtonX, spawnAllItemsButtonY, spawnAllItemsButtonWidth, spawnAllItemsButtonHeight);
+            this.spawnAllItemsButtonBounds = CreateButtonBounds(spawnAllItemsButtonLabel, giveGiftToAllButtonBounds.X, giveGiftToAllButtonBounds.Y + giveGiftToAllButtonBounds.Height + ButtonPadding);
 
             // "全图浇水壶" 按钮
-            this.isGlobalWateringCanEnabled = ToolPatch.IsGlobalWateringCanActive; // 从补丁中读取初始状态
-            UpdateWaterAllCropsButtonLabel(); // 更新按钮文本
-            int waterAllCropsButtonWidth = (int)SpriteText.getWidthOfString(waterAllCropsButtonLabel) + 16;
-            int waterAllCropsButtonHeight = SpriteText.getHeightOfString(waterAllCropsButtonLabel) + 3;
-            int waterAllCropsButtonX = getMoneyButtonX;
-            int waterAllCropsButtonY = spawnAllItemsButtonY + spawnAllItemsButtonHeight + buttonPadding;
-            this.waterAllCropsButtonBounds = new Rectangle(waterAllCropsButtonX, waterAllCropsButtonY, waterAllCropsButtonWidth, waterAllCropsButtonHeight);
+            this.isGlobalWateringCanEnabled = ToolPatch.IsGlobalWateringCanActive;
+            UpdateWaterAllCropsButtonLabel();
+            this.waterAllCropsButtonBounds = CreateButtonBounds(waterAllCropsButtonLabel, spawnAllItemsButtonBounds.X, spawnAllItemsButtonBounds.Y + spawnAllItemsButtonBounds.Height + ButtonPadding);
+
+            // "时间倒退一小时" 按钮
+            this.timeBackwardButtonBounds = CreateButtonBounds(timeForwardButtonLabel, timeForwardButtonBounds.X, timeForwardButtonBounds.Y + timeForwardButtonBounds.Height + ButtonPadding);
+
+            // "传送回家" 按钮
+            this.warpHomeButtonBounds = CreateButtonBounds(warpHomeButtonLabel, timeBackwardButtonBounds.X, timeBackwardButtonBounds.Y + timeBackwardButtonBounds.Height + ButtonPadding);
+
+            // "生成怪物在旁边" 按钮
+            this.spawnMonsterButtonBounds = CreateButtonBounds(spawnMonsterButtonLabel, warpHomeButtonBounds.X, warpHomeButtonBounds.Y + warpHomeButtonBounds.Height + ButtonPadding);
+
+            // "送出礼物给所有人" 按钮
+            this.giveGiftToAllButtonBounds = CreateButtonBounds(giveGiftToAllButtonLabel, spawnMonsterButtonBounds.X, spawnMonsterButtonBounds.Y + spawnMonsterButtonBounds.Height + ButtonPadding);
+
+            // "生成所有掉落物" 按钮
+            this.spawnAllItemsButtonBounds = CreateButtonBounds(spawnAllItemsButtonLabel, giveGiftToAllButtonBounds.X, giveGiftToAllButtonBounds.Y + giveGiftToAllButtonBounds.Height + ButtonPadding);
+
+            // "全图浇水壶" 按钮
+            this.isGlobalWateringCanEnabled = ToolPatch.IsGlobalWateringCanActive;
+            UpdateWaterAllCropsButtonLabel();
+            this.waterAllCropsButtonBounds = CreateButtonBounds(waterAllCropsButtonLabel, spawnAllItemsButtonBounds.X, spawnAllItemsButtonBounds.Y + spawnAllItemsButtonBounds.Height + ButtonPadding);
+
+            // "移速增" 按钮 (在第三列，与第一列顶部按钮Y坐标对齐)
+            this.increaseSpeedButtonBounds = CreateButtonBounds(increaseSpeedButtonLabel, linesDrawButtonBounds.X + linesDrawButtonBounds.Width + HorizontalPadding, getMoneyButtonBounds.Y);
+
+            // "移速减" 按钮 (在移速增按钮下方)
+            this.decreaseSpeedButtonBounds = CreateButtonBounds(decreaseSpeedButtonLabel, increaseSpeedButtonBounds.X, increaseSpeedButtonBounds.Y + increaseSpeedButtonBounds.Height + ButtonPadding);
+
+            // "移速空" 按钮 (在移速减按钮下方)
+            this.resetSpeedButtonBounds = CreateButtonBounds(resetSpeedButtonLabel, decreaseSpeedButtonBounds.X, decreaseSpeedButtonBounds.Y + decreaseSpeedButtonBounds.Height + ButtonPadding);
         }
+
+        /// <summary>
+        /// 创建按钮的边界矩形。
+        /// </summary>
+        /// <param name="label">按钮文本。</param>
+        /// <param name="xPos">按钮的X坐标。</param>
+        /// <param name="yPos">按钮的Y坐标。</param>
+        /// <returns>表示按钮边界的Rectangle。</returns>
+        private Rectangle CreateButtonBounds(string? label, int xPos, int yPos)
+        {
+            // 使用空合并运算符确保label不为null，避免CS8604警告
+            string actualLabel = label ?? string.Empty;
+            int width = (int)SpriteText.getWidthOfString(actualLabel) + ButtonTextPaddingWidth;
+            int height = SpriteText.getHeightOfString(actualLabel) + ButtonTextPaddingHeight;
+            return new Rectangle(xPos, yPos, width, height);
+        }
+
 
         private void UpdateWaterAllCropsButtonLabel() // 新增方法
         {
@@ -351,6 +391,78 @@ namespace rainyxinmain
                 ToolPatch.IsGlobalWateringCanActive = this.isGlobalWateringCanEnabled; // 更新补丁中的状态
                 UpdateWaterAllCropsButtonLabel(); // 更新按钮文本
             }
+            else if (this.linesDrawButtonBounds.Contains(x, y))
+            {
+                if (playSound) { Game1.playSound("coin"); } // 切换音效
+
+                this.isLinesDrawEnabled = !this.isLinesDrawEnabled; // 切换状态
+                ModEntry.IsLinesDrawActive = this.isLinesDrawEnabled; // 更新ModEntry中的状态
+                UpdateLinesDrawButtonLabel(); // 更新按钮文本
+            }
+            else if (this.increaseSpeedButtonBounds.Contains(x, y))
+            {
+                if (playSound) { Game1.playSound("coin"); }
+
+                ModEntry.CurrentSpeedModifier += 1f;
+                Game1.player.buffs.Remove(ModEntry.SpeedIncreaseBuffId);
+                Game1.player.buffs.Remove(ModEntry.SpeedDecreaseBuffId);
+
+                if (ModEntry.CurrentSpeedModifier != 0f)
+                {
+                    Game1.player.applyBuff(new Buff(
+                        ModEntry.CurrentSpeedModifier > 0 ? ModEntry.SpeedIncreaseBuffId : ModEntry.SpeedDecreaseBuffId,
+                        duration: 999999,
+                        effects: new BuffEffects { Speed = { Value = ModEntry.CurrentSpeedModifier } }
+                    ));
+                }
+                else // If modifier is 0, ensure no speed buff is active
+                {
+                    Game1.player.buffs.Remove(ModEntry.SpeedIncreaseBuffId);
+                    Game1.player.buffs.Remove(ModEntry.SpeedDecreaseBuffId);
+                }
+            }
+            else if (this.decreaseSpeedButtonBounds.Contains(x, y))
+            {
+                if (playSound) { Game1.playSound("coin"); }
+
+                ModEntry.CurrentSpeedModifier -= 1f;
+                Game1.player.buffs.Remove(ModEntry.SpeedIncreaseBuffId);
+                Game1.player.buffs.Remove(ModEntry.SpeedDecreaseBuffId);
+
+                if (ModEntry.CurrentSpeedModifier != 0f)
+                {
+                    Game1.player.applyBuff(new Buff(
+                        ModEntry.CurrentSpeedModifier > 0 ? ModEntry.SpeedIncreaseBuffId : ModEntry.SpeedDecreaseBuffId,
+                        duration: 999999,
+                        effects: new BuffEffects { Speed = { Value = ModEntry.CurrentSpeedModifier } }
+                    ));
+                }
+                else // If modifier is 0, ensure no speed buff is active
+                {
+                    Game1.player.buffs.Remove(ModEntry.SpeedIncreaseBuffId);
+                    Game1.player.buffs.Remove(ModEntry.SpeedDecreaseBuffId);
+                }
+            }
+            else if (this.resetSpeedButtonBounds.Contains(x, y))
+            {
+                if (playSound) { Game1.playSound("coin"); } // 使用一个合适的音效
+
+                ModEntry.CurrentSpeedModifier = 0f; // Reset speed modifier
+                Game1.player.buffs.Remove(ModEntry.SpeedIncreaseBuffId);
+                Game1.player.buffs.Remove(ModEntry.SpeedDecreaseBuffId);
+            }
+        }
+
+        private void UpdateLinesDrawButtonLabel() // 新增方法
+        {
+            if (this.isLinesDrawEnabled)
+            {
+                linesDrawButtonLabel = _translationHelper.Get("button.linesDraw.on");
+            }
+            else
+            {
+                linesDrawButtonLabel = _translationHelper.Get("button.linesDraw.off");
+            }
         }
 
         public override void draw(SpriteBatch b)
@@ -363,6 +475,10 @@ namespace rainyxinmain
             DrawButton(b, giveGiftToAllButtonBounds, giveGiftToAllButtonLabel);
             DrawButton(b, spawnAllItemsButtonBounds, spawnAllItemsButtonLabel);
             DrawButton(b, waterAllCropsButtonBounds, waterAllCropsButtonLabel ?? string.Empty);
+            DrawButton(b, linesDrawButtonBounds, linesDrawButtonLabel ?? string.Empty); // 绘制射线绘制按钮
+            DrawButton(b, increaseSpeedButtonBounds, increaseSpeedButtonLabel); // 绘制移速增按钮
+            DrawButton(b, decreaseSpeedButtonBounds, decreaseSpeedButtonLabel); // 绘制移速减按钮
+            DrawButton(b, resetSpeedButtonBounds, resetSpeedButtonLabel); // 绘制移速空按钮
         }
 
         private void DrawButton(SpriteBatch b, Rectangle bounds, string label)
