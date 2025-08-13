@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("rainyxinmain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a90cfda010b9fb746e6913838421739df3f82fb6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+01f567f2ebe927ac6ef7211d063f1cd2699f6731")]
 [assembly: System.Reflection.AssemblyProductAttribute("rainyxinmain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("rainyxinmain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
