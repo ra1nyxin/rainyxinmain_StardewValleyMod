@@ -1,7 +1,5 @@
 # Stardew Valley Mod: RainyXinMain
 
-这是一个为星露谷物语（Stardew Valley）开发的 SMAPI 模组，旨在提供一系列便捷的游戏内功能和优化。
-
 ## 功能列表
 
 ### 1. 自定义 `rainyTab` 页面
@@ -20,10 +18,8 @@
     *   对于每个可接收礼物的村民，增加玩家与该 NPC 的友谊值 80 点。如果尚无友谊数据，则创建新的友谊记录。
 *   **生成所有掉落物**：
     *   遍历所有游戏物品数据，在玩家当前位置生成每个物品作为掉落物。
-*   **全图浇水壶 (暂停开发)**：
-    *   此功能通过切换按钮状态来激活/禁用。
-    *   激活后，使用洒水壶时将影响当前地图上所有需要浇水且未浇水的耕地。
-    *   **注意**：此功能目前已根据用户指示暂停开发，可能存在未完善之处。
+*   **移速增/减**：点击后增加或减少玩家的移动速度，效果可累积，通过游戏内置Buff系统实现。
+*   **移速空**：清空所有因移速增减按钮带来的移速Buff，并将移速重设为默认状态。
 
 #### UI/UX 改进：
 
@@ -56,6 +52,8 @@
     *   修补了 `CraftingPage.GetRecipesToDisplay` 和 `CraftingRecipe` 构造函数用于实现全物品可制作功能。
     *   修补了 `Tool.tilesAffected` 用于“全图浇水壶”功能。
     *   修补了 `GameLocation.lockedDoorWarp` 用于强制传送。
+    *   修补了 `GameLocation.CheckItemPlantRules` 用于解除农作物种植限制。
+    *   修补了 `NPC.tryToReceiveActiveObject` 用于移除花束赠送限制。
 *   **C#**: 模组的主要开发语言。
 *   **Stardew Valley 游戏内部类**:
     *   `IClickableMenu`, `ClickableComponent`: UI 菜单和组件。
@@ -69,6 +67,10 @@
     *   `CraftingRecipe`: 合成配方类。
     *   `TerrainFeatures.HoeDirt`: 耕地地块。
     *   `WateringCan`: 洒水壶工具类。
+    *   `Farmer`: 玩家角色类，特别是 `applyBuff` 方法的使用。
+    *   `Buff`, `BuffEffects`, `BuffsList`: 游戏中的 Buff 系统。
+    *   `GameLocation`: 游戏地点类。
+    *   `NPC`, `Friendship`: NPC角色类及其好感度管理。
 *   **LINQ**: 用于数据查询和操作。
 *   **反射 (Reflection)**: 在运行时检查和修改类型信息（例如 `Activator.CreateInstance` 用于动态创建怪物实例）。
 *   **C# 可空引用类型 (`?`)**: 用于处理潜在的 `null` 值，提高代码健壮性。
@@ -81,7 +83,7 @@
     *   修正了物品类别判断的常量名称。
 *   **哈维诊所全物品排序问题**：通过在 `ShopPatch.Postfix` 中对物品列表进行 `DisplayName` 排序后重新添加到商店库存字典中解决。
 *   **“生成所有掉落物”按钮无法正常工作（物品未掉落）**：解决了 `dropObject` 参数问题和类型转换错误，最终通过 `Game1.createItemDebris` 解决物品掉落。
-*   **移除调试输出**：根据用户反馈，移除了“生成所有掉落物”和“送出礼物给所有人”功能中不必要的调试日志输出。
+*   **移除调试输出**：根据用户要求，移除了“生成所有掉落物”和“送出礼物给所有人”功能中不必要的调试日志输出。
 *   **在背包的制造页把全物品加入进去，配方统一为 10 个木材**：
     *   解决了 `CraftingRecipe` 字段访问问题和构造函数逻辑覆盖问题。
     *   核心解决方案：在 `ModEntry.cs` 中预先将所有物品注册到 `CraftingRecipe.craftingRecipes`，确保 `CraftingRecipe` 构造函数能正确初始化 `name`。然后，在 `CraftingRecipe` 构造函数的 `Postfix` 中，根据预注册的标识来修改配方详情。
@@ -89,10 +91,32 @@
     *   解决了 Harmony 参数名称不匹配（`isCooking` -> `isCookingRecipe`）。
     *   **关键修复**：解决了配方在存档加载后失效的问题，通过将 `ModEntry.RegisterCustomCraftingRecipes()` 方法的访问修饰符从 `private` 改为 `public`，并在 `CraftingPagePatch.Postfix` 方法的开头添加了 `ModEntry.Instance.RegisterCustomCraftingRecipes();` 调用，确保每次制造页打开时配方都会被重新注册。
 *   **按钮尺寸和字体调整**：通过调整 `RainyTabPage.cs` 中按钮的填充和字体缩放比例，使 UI 更加美观。
+*   **移速不生效与累积性问题**：
+    *   根本原因在于 `Farmer.addedSpeed` 属性的 `set` 访问器被废弃且无效，不能直接赋值。
+    *   解决方案是转为使用游戏内置的 Buff 系统 (`Game1.player.applyBuff`) 来间接调整玩家速度，并通过 `ModEntry.CurrentSpeedModifier` 静态变量实现移速的累积效果。
+    *   修正了 `removeBuff` 方法调用错误 (`Game1.buffsDisplay.removeBuff` 更正为 `Game1.player.buffs.Remove`)；修正了 `Buff` 构造函数参数不匹配；修正了 `BuffEffects` 属性赋值错误（`readonly NetFloat` 类型需要通过其 `Value` 属性进行赋值）。
+    *   通过在 `ModEntry.OnSaveLoaded` 中重置 `CurrentSpeedModifier`，确保进入存档后移速为默认状态。
+*   **农作物种植限制**：
+    *   通过 Harmony 补丁 `PlantingPatch` 拦截 `GameLocation.CheckItemPlantRules` 方法，强制其返回 `true`，从而解除了农作物必须种植在农场上的限制。
+    *   修复了 `deniedMessage = null;` 导致的“无法将 null 字面量转换为非 null 的引用类型”警告，将其改为 `deniedMessage = string.Empty;`。
+*   **NPC好感度无故暴增问题**：
+    *   排查了 `ModEntry.cs` 和 `RainyTabPage.cs`。
+    *   在 `RainyTabPage.cs` 中发现并修复了构造函数中重复的UI按钮边界定义，这可能是导致“送出礼物给所有人”按钮被误触的根本原因。
+*   **移除花束赠送限制**：
+    *   通过 Harmony 补丁 `BouquetPatch` 拦截 `NPC.tryToReceiveActiveObject` 方法，强制其接受花束，无论玩家婚姻状态或NPC可约会性。
+    *   解决了 `Game1.multiplayer` 访问级别问题（通过移除该行，因为 `Prefix` 补丁会跳过原始方法，且该功能非核心），并修正了 `Random.Choose` 方法调用为 `Game1.random.Choose`。
+*   **制造页物品筛选问题**：
+    *   通过修改 `rainyxinmain/CraftingPagePatch.cs`，移除了对 `StardewValley.Object.furnitureCategory` 和 `StardewValley.Object.SeedsCategory` 的筛选，现在所有物品都应该在制造页面中显示。
 *   **“全屏灌溉”功能实现（暂停中）**：
-    *   尝试了多种方法（直接设置 `HoeDirt.watered`、反射、`dynamic` 关键字、模拟工具行为），均未成功。
-    *   尝试通过 Harmony 补丁修改 `Tool.tilesAffected` 和 `WateringCan.DoFunction`，但遇到了编译错误和运行时错误。
-    *   当前状态：已将 `ToolPatch` 改为 Patch `Tool.tilesAffected`，并在 `Postfix` 中将所有需要浇水的地块添加到 `__result` 中，不再清空原始结果，希望利用游戏原版 `DoFunction` 的逻辑。此功能已根据用户指示暂停开发。
+    *   此功能已根据用户指示暂停开发。
+
+## 最近更新
+
+*   **移速功能修复与迭代**：修复了“移速增”和“移速减”按钮功能不生效的问题，通过游戏内置Buff系统实现移速的累积调整，并新增“移速空”按钮以重置移速。
+*   **解除农作物种植限制**：移除了在地图其他地方种植农作物时提示"必须种在农场上。"的限制。
+*   **NPC好感度无故暴增问题**：排查并修复了 `RainyTabPage.cs` 中重复的UI按钮边界定义，解决了NPC好感度无故暴增的问题。
+*   **移除花束赠送限制**：移除了已婚后给其他NPC送花束时被拒绝的限制，使其无论已婚或未婚都能与任何NPC约会。
+*   **制造页物品筛选问题**：移除了制造页对种子类物品的筛选，确保所有非烹饪物品都能在制造页面中显示。
 
 ## 安装与使用
 
@@ -118,7 +142,7 @@ D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain 的目录
 2025/08/08  下午 04:03            10,102 ModEntry.cs         # 模组入口点，负责 Harmony 补丁的注册和事件订阅
 2025/08/07  下午 10:33    <DIR>          obj                 # 编译中间文件目录
 2025/08/08  下午 12:33            20,610 RainyTabPage.cs     # 自定义 rainyTab 页面的 UI 逻辑和按钮功能实现
-2025/08/07  下午 10:32               935 rainyxinmain.csproj # C# 项目文件，定义项目配置、依赖和引用
+2022/08/07  下午 10:32               935 rainyxinmain.csproj # C# 项目文件，定义项目配置、依赖和引用
 2025/08/08  下午 06:54             8,963 README.md           # 项目说明文件
 2025/08/08  下午 12:56             2,281 ToolPatch.cs        # 工具（特别是洒水壶）相关的 Harmony 补丁
                8 个文件         48,717 字节
@@ -253,9 +277,3 @@ D:\vs\cs\StardewValleyMod\rainyxinmain\rainyxinmain 的目录
     *   这是您编写模组逻辑的起点。
 7.  **编译**: 构建项目。如果配置正确，编译成功后会在 `bin/Debug` (或 `bin/Release`) 目录下生成模组 DLL 和 `manifest.json`。
 8.  **部署**: 将编译好的模组文件夹（包含 DLL 和 `manifest.json`）复制到 `Stardew Valley/Mods` 目录。
-
-## 未来计划 (如果需要)
-
-*   继续完善“全图浇水壶”功能。
-*   根据用户反馈添加更多实用功能。
-*   进一步优化 UI/UX。
