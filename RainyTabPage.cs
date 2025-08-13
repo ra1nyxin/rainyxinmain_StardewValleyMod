@@ -113,26 +113,6 @@ namespace rainyxinmain
             UpdateWaterAllCropsButtonLabel();
             this.waterAllCropsButtonBounds = CreateButtonBounds(waterAllCropsButtonLabel, spawnAllItemsButtonBounds.X, spawnAllItemsButtonBounds.Y + spawnAllItemsButtonBounds.Height + ButtonPadding);
 
-            // "时间倒退一小时" 按钮
-            this.timeBackwardButtonBounds = CreateButtonBounds(timeForwardButtonLabel, timeForwardButtonBounds.X, timeForwardButtonBounds.Y + timeForwardButtonBounds.Height + ButtonPadding);
-
-            // "传送回家" 按钮
-            this.warpHomeButtonBounds = CreateButtonBounds(warpHomeButtonLabel, timeBackwardButtonBounds.X, timeBackwardButtonBounds.Y + timeBackwardButtonBounds.Height + ButtonPadding);
-
-            // "生成怪物在旁边" 按钮
-            this.spawnMonsterButtonBounds = CreateButtonBounds(spawnMonsterButtonLabel, warpHomeButtonBounds.X, warpHomeButtonBounds.Y + warpHomeButtonBounds.Height + ButtonPadding);
-
-            // "送出礼物给所有人" 按钮
-            this.giveGiftToAllButtonBounds = CreateButtonBounds(giveGiftToAllButtonLabel, spawnMonsterButtonBounds.X, spawnMonsterButtonBounds.Y + spawnMonsterButtonBounds.Height + ButtonPadding);
-
-            // "生成所有掉落物" 按钮
-            this.spawnAllItemsButtonBounds = CreateButtonBounds(spawnAllItemsButtonLabel, giveGiftToAllButtonBounds.X, giveGiftToAllButtonBounds.Y + giveGiftToAllButtonBounds.Height + ButtonPadding);
-
-            // "全图浇水壶" 按钮
-            this.isGlobalWateringCanEnabled = ToolPatch.IsGlobalWateringCanActive;
-            UpdateWaterAllCropsButtonLabel();
-            this.waterAllCropsButtonBounds = CreateButtonBounds(waterAllCropsButtonLabel, spawnAllItemsButtonBounds.X, spawnAllItemsButtonBounds.Y + spawnAllItemsButtonBounds.Height + ButtonPadding);
-
             // "移速增" 按钮 (在第三列，与第一列顶部按钮Y坐标对齐)
             this.increaseSpeedButtonBounds = CreateButtonBounds(increaseSpeedButtonLabel, linesDrawButtonBounds.X + linesDrawButtonBounds.Width + HorizontalPadding, getMoneyButtonBounds.Y);
 

@@ -48,8 +48,8 @@ namespace rainyxinmain
                     foreach (string qualifiedItemId in qualifiedItemIds)
                     {
                         Item item = ItemRegistry.Create(qualifiedItemId);
-                        // Exclude furniture and seeds for objects. Tools and weapons are included.
-                        if (item != null && item.Category != StardewValley.Object.furnitureCategory && item.Category != StardewValley.Object.SeedsCategory)
+                        // All items are included.
+                        if (item != null)
                         {
                             __result.Add(qualifiedItemId);
                         }
@@ -67,8 +67,8 @@ namespace rainyxinmain
             if (!isCookingRecipe)
             {
                 Item item = ItemRegistry.Create(name);
-                // If this is an item we want to make craftable (not furniture or seeds)
-                if (item != null && item.Category != StardewValley.Object.furnitureCategory && item.Category != StardewValley.Object.SeedsCategory)
+                // If this is an item we want to make craftable
+                if (item != null)
                 {
                     // Define the recipe: 10 wood
                     __instance.recipeList.Clear();
