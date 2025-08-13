@@ -1,5 +1,7 @@
 # Stardew Valley Mod: RainyXinMain
 
+<img width="1830" height="939" alt="image" src="https://github.com/user-attachments/assets/50e2b891-8e64-4f75-9141-0926f5d6dc66" />
+
 ## 功能列表
 
 ### 1. 自定义 `rainyTab` 页面
